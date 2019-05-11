@@ -9,7 +9,10 @@
    [Paste script contents]
    [CTRL+D]
    ```
-3. Enjoy automatically downloaded subtitles the next time you open MPV!
+3. Customize the script with your system's subliminal location. To determine the correct path, use:  
+`which subliminal`  
+Then copy this path to the subliminal variable on line 3 of your script.
+4. Enjoy automatically downloaded subtitles the next time you open MPV!
 
 ## Docs
 If you wish to modify or adapt this script to your needs,

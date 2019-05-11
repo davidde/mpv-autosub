@@ -1,4 +1,6 @@
 -- Requires Subliminal version 1.0 or newer
+-- Make sure to specify your system's Subliminal location below:
+subliminal = "/opt/anaconda3/bin/subliminal"
 local utils = require 'mp.utils'
 
 -- Log function: log to both terminal and mpv OSD (On-Screen Display)
@@ -10,7 +12,7 @@ end
 
 function download()
     log('Searching subtitles ...', 10)
-    table = { args = {'subliminal', 'download', '-s', '-l', 'en', mp.get_property('path')} }
+    table = { args = {subliminal, 'download', '-s', '-l', 'en', mp.get_property('path')} }
     result = utils.subprocess(table)
     if result.error == nil then
         -- Subtitles are downloaded successfully, so rescan to activate them:
@@ -43,3 +45,4 @@ function control_download()
 end
 
 mp.register_event('file-loaded', control_download)
+

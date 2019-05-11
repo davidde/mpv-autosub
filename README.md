@@ -1,17 +1,29 @@
 # Automatic subtitle downloading for the MPV mediaplayer
-## Usage
-1. This Lua script uses the Python program [subliminal](https://github.com/Diaoul/subliminal) to download subtitles. Make sure you have it installed:  
-`pip install subliminal`
-2. Copy this autosub.lua script into **~/.config/mpv/scripts/**:
-   ```shell
+## Setup
+1. This Lua script uses the Python program [subliminal](https://github.com/Diaoul/subliminal) to download subtitles.
+   Make sure you have it installed:  
+   ```
+   pip install subliminal
+   ```
+2. Copy autosub.lua into **~/.config/mpv/scripts/**:
+   ```
    mkdir ~/.config/mpv/scripts
    cat > ~/.config/mpv/scripts/autosub.lua
    [Paste script contents]
    [CTRL+D]
    ```
-3. Customize the script with your system's subliminal location. To determine the correct path, use:  
-`which subliminal`  
-Then copy this path to the subliminal variable on line 3 of your script.
+3. Customize the script with your system's subliminal location:  
+   - To determine the correct path, use:  
+     ```
+     which subliminal
+     ```  
+   - Copy this path to the subliminal variable on line 3 of your script:  
+     ```
+     vi ~/.config/mpv/scripts/autosub.lua
+     [Modify line 3: subliminal = "/path/to/your/subliminal"]
+     [Use `i` to modify, then `CTRL+SHIFT+V` to paste inside vi]
+     [Use `ESC`, then `:wq` to write the changes and exit]
+     ```
 4. Enjoy automatically downloaded subtitles the next time you open MPV!
 
 ## Docs

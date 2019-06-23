@@ -12,7 +12,7 @@ end
 
 function download()
     log('Searching subtitles ...', 10)
-    table = { args = {subliminal, 'download', '-s', '-l', 'en', mp.get_property('path')} }
+    table = { args = {subliminal, 'download', '-s', '-l', 'en', mp.get_property('filename')} }
     result = utils.subprocess(table)
     if result.error == nil then
         -- Subtitles are downloaded successfully, so rescan to activate them:

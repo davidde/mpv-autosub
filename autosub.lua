@@ -12,7 +12,7 @@ end
 
 function download()
     log('Searching subtitles ...', 10)
-    table = { args = {subliminal, 'download', '-s', '-l', 'en', mp.get_property('path')} }
+    table = { args = {subliminal, 'download', '-s', '-l', 'en', mp.get_property('filename')} }
     result = utils.subprocess(table)
     mp.msg.warn('result.stdout:', result.stdout)
     if string.find(result.stdout, 'Downloaded 1 subtitle') then

@@ -27,7 +27,7 @@ function download_subs()
         mp.commandv('rescan_external_files') 
         log('Subtitles ready!')
     else
-        log('Subtitles failed downloading')
+        log('No subtitles were found for this file.', 3)
     end
 end
 
@@ -35,7 +35,7 @@ end
 function control_download()
     duration = tonumber(mp.get_property('duration'))
     if duration < 900 then
-        mp.msg.warn('Video is less than 15 minutes\n', '=> NOT downloading any subtitles')
+        mp.msg.warn('Video is less than 15 minutes\n=> NOT downloading any subtitles')
         return
     end
     -- There does not seem to be any documentation for the 'sub' property,
@@ -45,10 +45,10 @@ function control_download()
     -- -> sub = 'auto' when called before the 'file-loaded' event is triggered
     sub = tonumber(mp.get_property('sub')) or 0
     if sub > 0 then
-        mp.msg.warn('Sub track is already present\n', '=> NOT downloading other subtitles')
+        mp.msg.warn('Sub track is already present\n=> NOT downloading other subtitles')
         return
     end
-    mp.msg.warn('No sub track was detected\n', '=> Proceeding to download subtitles:')
+    mp.msg.warn('No sub track was detected\n=> Proceeding to download subtitles:')
     download_subs()
 end
 

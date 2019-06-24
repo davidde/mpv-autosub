@@ -39,11 +39,11 @@ function control_download()
     end
     -- There does not seem to be any documentation for the 'sub' property,
     -- but it works on both internally encoded as well as external subtitle files!
-    -- -> sub = '1' when subtitles are present
+    -- -> sub = number of subtitle track(s), when they are present
     -- -> sub = 'no' when subtitles are not present
     -- -> sub = 'auto' when called before the 'file-loaded' event is triggered
-    sub = mp.get_property('sub')
-    if sub == '1' then
+    sub = tonumber(mp.get_property('sub')) or 0
+    if sub > 0 then
         mp.msg.warn('Sub track is already present\n', '=> NOT downloading other subtitles')
         return
     end
@@ -52,5 +52,5 @@ function control_download()
 end
 
 mp.register_event('file-loaded', control_download)
-mp.add_key_binding("b", "download_subs", download_subs)
+mp.add_key_binding('b', 'download_subs', download_subs)
 

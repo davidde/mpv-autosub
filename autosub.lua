@@ -11,7 +11,7 @@ function log(string, secs)
     mp.osd_message(string, secs) -- This logs to mpv screen
 end
 
-function download()
+function download_subs()
     log('Searching subtitles ...', 10)
 
     path = mp.get_property('path')
@@ -48,8 +48,9 @@ function control_download()
         return
     end
     mp.msg.warn('No sub track was detected\n', '=> Proceeding to download subtitles:')
-    download()
+    download_subs()
 end
 
 mp.register_event('file-loaded', control_download)
+mp.add_key_binding("b", "download_subs", download_subs)
 

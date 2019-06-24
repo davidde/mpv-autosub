@@ -14,7 +14,8 @@ function download()
     log('Searching subtitles ...', 10)
     table = { args = {subliminal, 'download', '-s', '-l', 'en', mp.get_property('path')} }
     result = utils.subprocess(table)
-    if result.error == nil then
+    mp.msg.warn('result.stdout:', result.stdout)
+    if string.find(result.stdout, 'Downloaded 1 subtitle') then
         -- Subtitles are downloaded successfully, so rescan to activate them:
         mp.commandv('rescan_external_files') 
         log('Subtitles ready!')

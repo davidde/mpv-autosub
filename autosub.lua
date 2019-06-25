@@ -17,9 +17,8 @@ function download_subs()
     path = mp.get_property('path')
     filename = mp.get_property('filename')
     save_dir = string.sub(path, 0, string.len(path) - string.len(filename))
-    media_title = mp.get_property('media-title')
 
-    table = { args = {subliminal, 'download', '-s', '-l', language, '-d', save_dir, media_title} }
+    table = { args = {subliminal, 'download', '-s', '-l', language, '-d', save_dir, filename} }
     result = utils.subprocess(table)
 
     if string.find(result.stdout, 'Downloaded 1 subtitle') then

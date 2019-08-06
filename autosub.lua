@@ -14,11 +14,13 @@ end
 function download_subs()
     log('Searching subtitles ...', 10)
 
-    path = mp.get_property('path')
-    filename = mp.get_property('filename')
-    save_dir = string.sub(path, 0, string.len(path) - string.len(filename))
-
-    table = { args = {subliminal, 'download', '-s', '-l', language, '-d', save_dir, filename} }
+    directory, filename = utils.split_path(mp.get_property('path'))
+    table = {
+        args = {
+            subliminal, '--debug', 'download', '-s', '-f', '-l', language, '-d', directory, filename
+            -- To see --debug output start mpv from terminal!
+        }
+    }
     result = utils.subprocess(table)
 
     if string.find(result.stdout, 'Downloaded 1 subtitle') then

@@ -19,7 +19,8 @@ function download_subs()
     directory, filename = utils.split_path(mp.get_property('path'))
     table = {
         args = { -- To see --debug output start mpv from terminal!
-            subliminal, '--debug', 'download', '-s', '-f', '-l', language[2], '-d', directory, filename
+            subliminal, '--debug', 'download', '-s', '-f', '-l', language[2], '-d', directory, '-p', 'addic7ed',
+            '-p', 'legendastv', '-p', 'podnapisi', '-p', 'shooter', '-p', 'thesubdb', '-p', 'tvsubtitles', filename
         }
     }
     result = utils.subprocess(table)

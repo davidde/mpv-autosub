@@ -44,9 +44,10 @@ function control_download()
     end
     track_list = mp.get_property_native('track-list')
     -- mp.msg.warn('track_list = ', mp.get_property('track-list'), '\n')
-    for i, track in pairs(track_list) do
+    for _, track in pairs(track_list) do
         if track['type'] == 'sub' then
-            if track['lang'] == language[3] or track['lang'] == language[2] then
+            if track['lang'] == language[3] or track['lang'] == language[2]
+                or track['title']:lower():find(language[3]) then
                 mp.msg.warn('Embedded ' .. language[1] ..
                             ' subtitles are already present:\n' ..
                             '=> NOT downloading new subtitles')

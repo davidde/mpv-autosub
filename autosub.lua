@@ -8,13 +8,13 @@ local utils = require 'mp.utils'
 
 -- Log function: log to both terminal and mpv OSD (On-Screen Display)
 function log(string, secs)
-    secs = secs or 2     -- secs defaults to 2 when the secs parameter is absent
+    secs = secs or 2.5     -- secs defaults to 2.5 when the secs parameter is absent
     mp.msg.warn(string)          -- This logs to the terminal
     mp.osd_message(string, secs) -- This logs to mpv screen
 end
 
 function download_subs()
-    log('Searching subtitles ...', 10)
+    log('Searching subtitles ...', 30)
 
     directory, filename = utils.split_path(mp.get_property('path'))
     table = {

@@ -24,10 +24,13 @@
      [Use `i` to modify, then `CTRL+SHIFT+V` to paste inside vi]
      [Use `ESC`, then `:wq` to write the changes and exit]
      ```
-4. Optionally change the subtitle languages / [ISO codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) on line 6. Be sure to put your preferred language at the top of the list.
-5. Optionally specify your login for your preferred subtitle provider, if you have one.
+4. Optionally change the subtitle languages / 
+   [ISO codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) on line 6.  
+   Be sure to put your preferred language at the top of the list.
+5. Optionally specify the login of your preferred subtitle provider, if you have one.
 6. Enjoy automatically downloaded subtitles the next time you open MPV!  
-   (If necessary, you can manually trigger the download by pressing `b`.)
+   (If necessary, you can manually trigger downloading your first choice language by pressing `b`,
+   or your second choice language by pressing `n`.)
 
 ## Docs
 If you wish to modify or adapt this script to your needs,

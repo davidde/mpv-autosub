@@ -1,18 +1,26 @@
 -- Requires Subliminal version 1.0 or newer
 -- Make sure to specify your system's Subliminal location below:
-subliminal = '/opt/anaconda3/bin/subliminal'
+local subliminal = '/opt/anaconda3/bin/subliminal'
 -- Specify languages in this order: { 'language name', 'ISO-639-1', 'ISO-639-2' } !
 -- (See: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
-languages = {
+local languages = {
     -- If subtitles are found for the first language,
     -- other languages will NOT be downloaded,
     -- so put your preferred language first:
     { 'English', 'en', 'eng' },
     { 'Dutch', 'nl', 'dut' },
-    { 'Polish', 'pl', 'pol' },
+    -- { 'Spanish', 'es', 'spa' },
+    -- { 'French', 'fr', 'fre' },
+    -- { 'German', 'de', 'ger' },
+    -- { 'Italian', 'it', 'ita' },
+    -- { 'Portuguese', 'pt', 'por' },
+    -- { 'Polish', 'pl', 'pol' },
+    -- { 'Russian', 'ru', 'rus' },
+    -- { 'Chinese', 'zh', 'chi' },
+    -- { 'Arabic', 'ar', 'ara' },
 }
 -- Optional provider login: e.g. { '--opensubtitles', 'USERNAME', 'PASSWORD' }
-login = {}
+local login = {}
 local utils = require 'mp.utils'
 
 -- Log function: log to both terminal and mpv OSD (On-Screen Display)
@@ -20,6 +28,12 @@ function log(string, secs)
     secs = secs or 2.5     -- secs defaults to 2.5 when the secs parameter is absent
     mp.msg.warn(string)          -- This logs to the terminal
     mp.osd_message(string, secs) -- This logs to mpv screen
+end
+
+-- Sleep function: give mpv OSD messages time to be read before being overwritten by next message
+function sleep(s)
+    local ntime = os.time() + s
+    repeat until os.time() > ntime
 end
 
 -- Download function: download the best subtitles in most preferred language
@@ -73,8 +87,8 @@ function control_downloads()
     end
     track_list = mp.get_property_native('track-list')
     -- mp.msg.warn('track_list = ', mp.get_property('track-list'), '\n')
-    for _, language in pairs(languages) do
-        if should_download_subs_in(language, track_list) then
+    for i, language in pairs(languages) do
+        if should_download_subs_in(language, track_list, i) then
             if download_subs(language) == true then
                 return
             end
@@ -86,16 +100,20 @@ function control_downloads()
 end
 
 -- Check for subs already present (either embedded in video or external subtitle files):
-function should_download_subs_in(language, track_list)
+function should_download_subs_in(language, track_list, i)
     for _, track in pairs(track_list) do
         if track['type'] == 'sub' then
             if track['lang'] == language[3] or track['lang'] == language[2]
-                or (track['title'] and track['title']:lower():find(language[3])) then
-                log('Embedded ' .. language[1] .. ' subtitles are present')
+            or (track['title'] and track['title']:lower():find(language[3])) then
+                mp.msg.warn('Embedded ' .. language[1] .. ' subtitles are present')
                 mp.msg.warn('=> NOT downloading new subtitles')
+                sleep(1.5) -- Do not overwrite potential previous OSD message
                 if not track['selected'] then
-                    mp.msg.warn('=> Enabling embedded ' .. language[1] .. ' subtitles:')
                     mp.set_property('sid', track['id'])
+                    log('Enabled embedded ' .. language[1] .. ' subtitles!')
+                -- We don't need OSD notifs if the right subtitles are present from the start:
+                elseif i ~= 1 then
+                    log(language[1] .. ' subtitles already active')
                 end
                 return false
             elseif track['external'] == true then

@@ -20,47 +20,57 @@ local languages = {
     -- { 'Chinese', 'zh', 'chi' },
     -- { 'Arabic', 'ar', 'ara' },
 }
--- Optional provider login: e.g. { '--opensubtitles', 'USERNAME', 'PASSWORD' }
-local login = {}
+-- Optional provider logins:
+local logins = {
+    -- { '--addic7ed', 'USERNAME', 'PASSWORD' },
+    -- { '--legendastv', 'USERNAME', 'PASSWORD' },
+    -- { '--opensubtitles', 'USERNAME', 'PASSWORD' },
+    -- { '--subscenter', 'USERNAME', 'PASSWORD' },
+}
+-- Some additional options:
+local bools = {
+    debug = true, -- Use `--debug` in subliminal command for debug output
+    force = true, -- Force download; will overwrite existing subtitle files
+    utf8 = true,  -- Save all subtitle files as UTF-8
+}
 local utils = require 'mp.utils'
 
--- Log function: log to both terminal and mpv OSD (On-Screen Display)
-function log(string, secs)
-    secs = secs or 2.5  -- secs defaults to 2.5 when secs parameter is absent
-    mp.msg.warn(string)          -- This logs to the terminal
-    mp.osd_message(string, secs) -- This logs to mpv screen
-end
-
--- Sleep function: give the mpv OSD messages time to be read
--- before being overwritten by the next message
-function sleep(s)
-    local ntime = os.time() + s
-    repeat until os.time() > ntime
-end
 
 -- Download function: download the best subtitles in most preferred language
 function download_subs(language)
     language = language or languages[1]
     log('Searching ' .. language[1] .. ' subtitles ...', 30)
-
     directory, filename = utils.split_path(mp.get_property('path'))
-    if login[1] then
-        mp.msg.warn('Using ' .. login[1] .. ' login')
-        table = {
-            args = { -- To see --debug output start mpv from terminal!
-                subliminal, login[1], login[2], login[3], '--debug',
-                'download', '-f', '-l', language[2], '-d', directory, filename
-            }
-        }
-    else
-        mp.msg.warn('Not using any provider login')
-        table = {
-            args = { -- To see --debug output start mpv from terminal!
-                subliminal, '--debug', 'download', '-f',
-                '-l', language[2], '-d', directory, filename
-            }
-        }
+
+    -- Start building the `subliminal` command, starting with the executable:
+    table = { args = { subliminal } }
+    a = table.args
+
+    for _, login in ipairs(logins) do
+        a[#a + 1] = login[1]
+        a[#a + 1] = login[2]
+        a[#a + 1] = login[3]
     end
+    if bools.debug then
+        -- To see `--debug` output start MPV from the terminal!
+        a[#a + 1] = '--debug'
+    end
+
+    a[#a + 1] = 'download'
+    if bools.force then
+        a[#a + 1] = '-f'
+    end
+    if bools.utf8 then
+        a[#a + 1] = '-e'
+        a[#a + 1] = 'utf-8'
+    end
+
+    a[#a + 1] = '-l'
+    a[#a + 1] = language[2]
+    a[#a + 1] = '-d'
+    a[#a + 1] = directory
+    a[#a + 1] = filename --> Subliminal command ends with the movie filename.
+
     result = utils.subprocess(table)
 
     if string.find(result.stdout, 'Downloaded 1 subtitle') then
@@ -109,8 +119,7 @@ function control_downloads()
     log('No subtitles were found')
 end
 
--- Check for subs already present:
--- (either embedded in video or external subtitle files)
+-- Check if new subtitles should be downloaded in this language:
 function should_download_subs_in(language, track_list, i)
     for _, track in ipairs(track_list) do
         if track['type'] == 'sub' then
@@ -163,10 +172,25 @@ function external_subs_in(language, track)
         mp.msg.warn('=> NOT downloading other subtitles')
         if not track['selected'] then
             mp.set_property('sid', track['id'])
+            sleep(1.5) -- Do not overwrite potential previous OSD message
             log('Enabled external ' .. language[1] .. ' subtitle file!')
         end
         return true -- The right external subtitle file is already present
     end
+end
+
+-- Log function: log to both terminal and MPV OSD (On-Screen Display)
+function log(string, secs)
+    secs = secs or 2.5  -- secs defaults to 2.5 when secs parameter is absent
+    mp.msg.warn(string)          -- This logs to the terminal
+    mp.osd_message(string, secs) -- This logs to MPV screen
+end
+
+-- Sleep function: give the MPV OSD messages time to be read
+-- before being overwritten by the next message
+function sleep(s)
+    local ntime = os.time() + s
+    repeat until os.time() > ntime
 end
 
 mp.register_event('file-loaded', control_downloads)

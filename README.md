@@ -1,40 +1,60 @@
 # Automatic subtitle downloading for the MPV mediaplayer
+* Cross-platform: **Windows, Mac and Linux**
+* Multi-language support
+* Subtitle provider login support
+* **No hotkeys required**: opening video will trigger automatic subtitle download  
+  (only when no subtitles are present)
+
+## Dependencies
+This Lua script uses the [Python](https://www.python.org/downloads/) program
+[subliminal](https://github.com/Diaoul/subliminal) to download subtitles.
+Make sure you have both installed:  
+```bash
+pip install subliminal
+```
+
 ## Setup
-1. This Lua script uses the Python program [subliminal](https://github.com/Diaoul/subliminal) to download subtitles.
-   Make sure you have it installed:  
-   ```
-   pip install subliminal
-   ```
-2. Copy autosub.lua into **~/.config/mpv/scripts/**:
-   ```
+1. Copy autosub.lua into:
+
+   |       OS      |                      Path                          |
+   |---------------|----------------------------------------------------|
+   | **Windows**   | [Drive]:\Users\\[User]\AppData\Roaming\mpv\scripts |
+   | **Mac/Linux** | ~/.config/mpv/scripts/                             |
+
+   ```bash
    mkdir ~/.config/mpv/scripts
    cat > ~/.config/mpv/scripts/autosub.lua
-   [Paste script contents]
-   [CTRL+D]
+   [Paste script contents and CTRL+D]
    ```
-3. Customize the script with your system's subliminal location:  
+2. Specify the correct subliminal location for your system:  
    - To determine the correct path, use:  
-     ```
-     which subliminal
-     ```  
-   - Copy this path to the subliminal variable on line 3 of your script:  
-     ```
-     vi ~/.config/mpv/scripts/autosub.lua
-     [Modify line 3: subliminal = "/path/to/your/subliminal"]
-     [Use `i` to modify, then `CTRL+SHIFT+V` to paste inside vi]
-     [Use `ESC`, then `:wq` to write the changes and exit]
-     ```
-4. Optionally change the subtitle languages / 
-   [ISO codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) on line 6.  
-   Be sure to put your preferred language at the top of the list.
-5. Optionally specify the login of your preferred subtitle provider, if you have one.
-6. Enjoy automatically downloaded subtitles the next time you open MPV!  
-   (If necessary, you can manually trigger downloading your first choice language by pressing `b`,
-   or your second choice language by pressing `n`.)
 
-## Docs
-If you wish to modify or adapt this script to your needs,
-be sure to check out the [MPV Lua API](https://mpv.io/manual/stable/#lua-scripting).
+     |       OS      |      App       |        Command          |
+     |---------------|----------------|-------------------------|
+     | **Windows**   | Command Prompt |    where subliminal     |
+     | **Mac/Linux** | Terminal       |    which subliminal     |
+
+   - Copy this path to the subliminal variable at the start of the script:
+     ```lua
+     local subliminal = '/path/to/your/subliminal'
+     ```
+     On Windows, the backslashes in the path need to be escaped, e.g.:  
+     **C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python37\\\\Scripts\\\\subliminal.exe**
+
+## Customization
+* Optionally change the subtitle languages / [ISO codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes).  
+  Be sure to put your preferred language at the top of the list.
+* Optionally specify the login credentials for your preferred subtitle provider(s), if you have one.
+* If necessary, you can manually trigger downloading your first choice language by pressing `b`,  
+  or your second choice language by pressing `n`.
+
+This script is under the [MIT License](./LICENSE-MIT),
+so you are free to modify and adapt this script to your needs:  
+check out the [MPV Lua API](https://mpv.io/manual/stable/#lua-scripting) for more information.
+
+If you find yourself unable to find the correct subtitles for some niche movies/series,
+you might be interested in the [submod](https://github.com/DavidDeprost/submod_rs)
+command line tool I've written to manually correct subtitle timing.
 
 ## Credits
 Inspired by [selsta's](https://gist.github.com/selsta/ce3fb37e775dbd15c698) and

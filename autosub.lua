@@ -116,8 +116,8 @@ function control_downloads()
 
     track_list = mp.get_property_native('track-list')
     -- mp.msg.warn('track_list = ', mp.get_property('track-list'), '\n')
-    for i, language in ipairs(languages) do
-        if should_download_subs_in(language, track_list, i) then
+    for _, language in ipairs(languages) do
+        if should_download_subs_in(language, track_list) then
             if download_subs(language) == true then
                 return
             end
@@ -129,11 +129,11 @@ function control_downloads()
 end
 
 -- Check if new subtitles should be downloaded in this language:
-function should_download_subs_in(language, track_list, i)
+function should_download_subs_in(language, track_list)
     for _, track in ipairs(track_list) do
         if track['type'] == 'sub' then
             if track['external'] == false then
-                if embedded_subs_in(language, track, i) then
+                if embedded_subs_in(language, track) then
                     return false
                 end
             elseif external_subs_in(language, track) then
@@ -147,7 +147,7 @@ function should_download_subs_in(language, track_list, i)
 end
 
 -- Check if embedded subs are present in the right language:
-function embedded_subs_in(language, track, i)
+function embedded_subs_in(language, track)
     if track['lang'] == language[3] or track['lang'] == language[2]
         or (track['title'] and track['title']:lower():find(language[3])) then
             mp.msg.warn('Embedded ' .. language[1] .. ' subtitles are present')
@@ -156,10 +156,8 @@ function embedded_subs_in(language, track, i)
             if not track['selected'] then
                 mp.set_property('sid', track['id'])
                 log('Enabled embedded ' .. language[1] .. ' subtitles!')
-            -- We don't need OSD notifs if the right subtitles
-            -- are present from the start:
-            elseif i ~= 1 then
-                log(language[1] .. ' subtitles already active')
+            else
+                log('Embedded ' .. language[1] .. ' subtitles are active')
             end
             return true -- The right embedded subtitles are already present
     end

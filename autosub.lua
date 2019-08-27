@@ -29,6 +29,7 @@ local logins = {
 }
 -- Some additional options:
 local bools = {
+    auto = true,  -- Automatically download subtitles, no hotkeys required
     debug = true, -- Use `--debug` in subliminal command for debug output
     force = true, -- Force download; will overwrite existing subtitle files
     utf8 = true,  -- Save all subtitle files as UTF-8
@@ -74,6 +75,9 @@ function download_subs(language)
     result = utils.subprocess(table)
 
     if string.find(result.stdout, 'Downloaded 1 subtitle') then
+        -- When multiple external files are present,
+        -- always activate the most recently downloaded:
+        mp.set_property('slang', language[2])
         -- Subtitles are downloaded successfully, so rescan to activate them:
         mp.commandv('rescan_external_files')
         log(language[1] .. ' subtitles ready!')
@@ -91,19 +95,24 @@ end
 
 -- Control function: only download if necessary
 function control_downloads()
-    duration = tonumber(mp.get_property('duration'))
-    if duration < 900 then
-        mp.msg.warn('Video is less than 15 minutes\n' ..
-                    '=> NOT downloading any subtitles')
-        return
-    end
-
     -- Make MPV accept external subtitle files with language specifier:
     mp.set_property('sub-auto', 'fuzzy')
     -- Set subtitle language preference:
     mp.set_property('slang', languages[1][2])
     mp.msg.warn('Reactivate external subtitle files:')
     mp.commandv('rescan_external_files')
+
+    if not bools.auto then
+        mp.msg.warn('Automatic downloading disabled!')
+        return
+    end
+
+    duration = tonumber(mp.get_property('duration'))
+    if duration < 900 then
+        mp.msg.warn('Video is less than 15 minutes\n' ..
+                    '=> NOT downloading any subtitles')
+        return
+    end
 
     track_list = mp.get_property_native('track-list')
     -- mp.msg.warn('track_list = ', mp.get_property('track-list'), '\n')
@@ -193,6 +202,7 @@ function sleep(s)
     repeat until os.time() > ntime
 end
 
-mp.register_event('file-loaded', control_downloads)
+
 mp.add_key_binding('b', 'download_subs', download_subs)
 mp.add_key_binding('n', 'download_subs2', download_subs2)
+mp.register_event('file-loaded', control_downloads)

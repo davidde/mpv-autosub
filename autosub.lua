@@ -1,39 +1,60 @@
--- Requires Subliminal version 1.0 or newer
--- Make sure to specify your system's Subliminal location below:
+--_____________________________________________________________________________
+--=============================================================================
+--
+--                         CONFIGURATION SETTINGS
+--_____________________________________________________________________________
+--=============================================================================
+-->>    SUBLIMINAL PATH
+--=============================================================================
+--          This script uses Subliminal to download subtitles,
+--          so make sure to specify your system's Subliminal location below:
 local subliminal = '/opt/anaconda3/bin/subliminal'
--- Specify languages in this order:
--- { 'language name', 'ISO-639-1', 'ISO-639-2' } !
--- (See: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+--=============================================================================
+-->>    SUBTITLE LANGUAGE
+--=============================================================================
+--          Specify languages in this order:
+--          { 'language name', 'ISO-639-1', 'ISO-639-2' } !
+--          (See: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 local languages = {
-    -- If subtitles are found for the first language,
-    -- other languages will NOT be downloaded,
-    -- so put your preferred language first:
-    { 'English', 'en', 'eng' },
-    { 'Dutch', 'nl', 'dut' },
-    -- { 'Spanish', 'es', 'spa' },
-    -- { 'French', 'fr', 'fre' },
-    -- { 'German', 'de', 'ger' },
-    -- { 'Italian', 'it', 'ita' },
-    -- { 'Portuguese', 'pt', 'por' },
-    -- { 'Polish', 'pl', 'pol' },
-    -- { 'Russian', 'ru', 'rus' },
-    -- { 'Chinese', 'zh', 'chi' },
-    -- { 'Arabic', 'ar', 'ara' },
+--          If subtitles are found for the first language,
+--          other languages will NOT be downloaded,
+--          so put your preferred language first:
+            { 'English', 'en', 'eng' },
+            { 'Dutch', 'nl', 'dut' },
+--          { 'Spanish', 'es', 'spa' },
+--          { 'French', 'fr', 'fre' },
+--          { 'German', 'de', 'ger' },
+--          { 'Italian', 'it', 'ita' },
+--          { 'Portuguese', 'pt', 'por' },
+--          { 'Polish', 'pl', 'pol' },
+--          { 'Russian', 'ru', 'rus' },
+--          { 'Chinese', 'zh', 'chi' },
+--          { 'Arabic', 'ar', 'ara' },
 }
--- Optional provider logins:
+--=============================================================================
+-->>    PROVIDER LOGINS
+--=============================================================================
+--          These are completely optional and not required
+--          for the functioning of the script!
+--          If you use any of these services, simply uncomment it
+--          and replace 'USERNAME' and 'PASSWORD' with your own:
 local logins = {
-    -- { '--addic7ed', 'USERNAME', 'PASSWORD' },
-    -- { '--legendastv', 'USERNAME', 'PASSWORD' },
-    -- { '--opensubtitles', 'USERNAME', 'PASSWORD' },
-    -- { '--subscenter', 'USERNAME', 'PASSWORD' },
+--          { '--addic7ed', 'USERNAME', 'PASSWORD' },
+--          { '--legendastv', 'USERNAME', 'PASSWORD' },
+--          { '--opensubtitles', 'USERNAME', 'PASSWORD' },
+--          { '--subscenter', 'USERNAME', 'PASSWORD' },
 }
--- Some additional options:
+--=============================================================================
+-->>    ADDITIONAL OPTIONS
+--=============================================================================
 local bools = {
     auto = true,  -- Automatically download subtitles, no hotkeys required
     debug = true, -- Use `--debug` in subliminal command for debug output
     force = true, -- Force download; will overwrite existing subtitle files
     utf8 = true,  -- Save all subtitle files as UTF-8
 }
+--_____________________________________________________________________________
+--=============================================================================
 local utils = require 'mp.utils'
 
 

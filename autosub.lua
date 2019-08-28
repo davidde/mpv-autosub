@@ -41,11 +41,11 @@ local utils = require 'mp.utils'
 function download_subs(language)
     language = language or languages[1]
     log('Searching ' .. language[1] .. ' subtitles ...', 30)
-    directory, filename = utils.split_path(mp.get_property('path'))
+    local directory, filename = utils.split_path(mp.get_property('path'))
 
     -- Start building the `subliminal` command, starting with the executable:
-    table = { args = { subliminal } }
-    a = table.args
+    local table = { args = { subliminal } }
+    local a = table.args
 
     for _, login in ipairs(logins) do
         a[#a + 1] = login[1]
@@ -72,7 +72,7 @@ function download_subs(language)
     a[#a + 1] = directory
     a[#a + 1] = filename --> Subliminal command ends with the movie filename.
 
-    result = utils.subprocess(table)
+    local result = utils.subprocess(table)
 
     if string.find(result.stdout, 'Downloaded 1 subtitle') then
         -- When multiple external files are present,
@@ -107,14 +107,14 @@ function control_downloads()
         return
     end
 
-    duration = tonumber(mp.get_property('duration'))
+    local duration = tonumber(mp.get_property('duration'))
     if duration < 900 then
         mp.msg.warn('Video is less than 15 minutes\n' ..
                     '=> NOT downloading any subtitles')
         return
     end
 
-    track_list = mp.get_property_native('track-list')
+    local track_list = mp.get_property_native('track-list')
     -- mp.msg.warn('track_list = ', mp.get_property('track-list'), '\n')
     for _, language in ipairs(languages) do
         if should_download_subs_in(language, track_list) then
@@ -165,9 +165,9 @@ end
 
 -- Check if external subtitle file is present in the right language:
 function external_subs_in(language, track)
-    video_name = mp.get_property('filename/no-ext')
-    sub_name = track['title']:sub(1, -5)
-    lang = sub_name:sub(video_name:len() + 2)
+    local video_name = mp.get_property('filename/no-ext')
+    local sub_name = track['title']:sub(1, -5)
+    local lang = sub_name:sub(video_name:len() + 2)
     if video_name == sub_name then
         mp.msg.warn('An exactly matching external ' ..
             'subtitle file of unknown language is present')

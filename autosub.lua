@@ -1,16 +1,11 @@
---_____________________________________________________________________________
 --=============================================================================
---
---                         CONFIGURATION SETTINGS
---_____________________________________________________________________________
---=============================================================================
--->>    SUBLIMINAL PATH
+-->>    SUBLIMINAL PATH:
 --=============================================================================
 --          This script uses Subliminal to download subtitles,
 --          so make sure to specify your system's Subliminal location below:
 local subliminal = '/opt/anaconda3/bin/subliminal'
 --=============================================================================
--->>    SUBTITLE LANGUAGE
+-->>    SUBTITLE LANGUAGE:
 --=============================================================================
 --          Specify languages in this order:
 --          { 'language name', 'ISO-639-1', 'ISO-639-2' } !
@@ -32,7 +27,7 @@ local languages = {
 --          { 'Arabic', 'ar', 'ara' },
 }
 --=============================================================================
--->>    PROVIDER LOGINS
+-->>    PROVIDER LOGINS:
 --=============================================================================
 --          These are completely optional and not required
 --          for the functioning of the script!
@@ -45,7 +40,7 @@ local logins = {
 --          { '--subscenter', 'USERNAME', 'PASSWORD' },
 }
 --=============================================================================
--->>    ADDITIONAL OPTIONS
+-->>    ADDITIONAL OPTIONS:
 --=============================================================================
 local bools = {
     auto = true,  -- Automatically download subtitles, no hotkeys required
@@ -53,7 +48,6 @@ local bools = {
     force = true, -- Force download; will overwrite existing subtitle files
     utf8 = true,  -- Save all subtitle files as UTF-8
 }
---_____________________________________________________________________________
 --=============================================================================
 local utils = require 'mp.utils'
 

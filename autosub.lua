@@ -48,6 +48,19 @@ local bools = {
     force = true, -- Force download; will overwrite existing subtitle files
     utf8 = true,  -- Save all subtitle files as UTF-8
 }
+local excludes = {
+    -- Movies with a path containing any of these strings/paths
+    -- will be excluded from auto-downloading subtitles.
+    -- Full paths are also allowed, e.g.:
+    -- '/home/david/Videos',
+    'no-subs-dl',
+}
+local includes = {
+    -- If anything is defined here, only the movies with a path
+    -- containing any of these strings/paths will auto-download subtitles.
+    -- Full paths are also allowed, e.g.:
+    -- '/home/david/Videos',
+}
 --=============================================================================
 local utils = require 'mp.utils'
 
@@ -56,9 +69,8 @@ local utils = require 'mp.utils'
 function download_subs(language)
     language = language or languages[1]
     log('Searching ' .. language[1] .. ' subtitles ...', 30)
-    local directory, filename = utils.split_path(mp.get_property('path'))
 
-    -- Start building the `subliminal` command, starting with the executable:
+    -- Build the `subliminal` command, starting with the executable:
     local table = { args = { subliminal } }
     local a = table.args
 
@@ -116,10 +128,32 @@ function control_downloads()
     mp.set_property('slang', languages[1][2])
     mp.msg.warn('Reactivate external subtitle files:')
     mp.commandv('rescan_external_files')
+    directory, filename = utils.split_path(mp.get_property('path'))
 
     if not bools.auto then
         mp.msg.warn('Automatic downloading disabled!')
         return
+    end
+
+    for _, exclude in ipairs(excludes) do
+        local escaped_exclude = exclude:gsub('%W','%%%0')
+        local excluded = directory:find(escaped_exclude)
+
+        if excluded then
+            mp.msg.warn('This path is excluded from auto-downloading subs')
+            return
+        end
+    end
+
+    for i, include in ipairs(includes) do
+        local escaped_include = include:gsub('%W','%%%0')
+        local included = directory:find(escaped_include)
+
+        if included then break
+        elseif i == #includes then
+            mp.msg.warn('This path is not included for auto-downloading subs')
+            return
+        end
     end
 
     local duration = tonumber(mp.get_property('duration'))

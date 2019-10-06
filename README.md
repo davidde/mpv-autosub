@@ -16,10 +16,10 @@ pip install subliminal
 ## Setup
 1. Copy autosub.lua into:
 
-   |       OS      |                      Path                          |
-   |---------------|----------------------------------------------------|
-   | **Windows**   | [Drive]:\Users\\[User]\AppData\Roaming\mpv\scripts |
-   | **Mac/Linux** | ~/.config/mpv/scripts/                             |
+   |       OS      |                      Path                           |
+   |---------------|-----------------------------------------------------|
+   | **Windows**   | [Drive]:\Users\\[User]\AppData\Roaming\mpv\scripts\ |
+   | **Mac/Linux** | ~/.config/mpv/scripts/                              |
 
    ```bash
    mkdir ~/.config/mpv/scripts
@@ -47,8 +47,10 @@ pip install subliminal
   If necessary, you can manually trigger downloading your first choice language by pressing `b`,  
   or your second choice language by pressing `n`.
 * Optionally specify the login credentials for your preferred subtitle provider(s), if you have one.
-* If you do not care for the automatic downloading functionality, and simply wish to use the hotkeys,
-  just change the `auto` bool to `false`.
+* If you do not care for the automatic downloading functionality, and only wish to use the hotkeys,  
+  simply change the `auto` bool to `false`.
+* For added convenience, you can specify the locations to exclude from auto-downloading subtitles, or alternatively,  
+the *only* locations that *should* auto-download subtitles.
 
 This script is under the [MIT License](./LICENSE-MIT),
 so you are free to modify and adapt this script to your needs:  

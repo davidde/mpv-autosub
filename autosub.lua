@@ -197,7 +197,11 @@ end
 
 -- Check if embedded subs are present in the right language:
 function embedded_subs_in(language, track)
-    if track['lang'] == language[3] or track['lang'] == language[2]
+    if not track['lang'] and not track['title'] then
+        log('Unknown embedded subtitles are active!')
+        mp.msg.warn('=> NOT downloading new subtitles')
+        return true -- Don't download if 'lang' key is absent
+    elseif track['lang'] == language[3] or track['lang'] == language[2]
         or (track['title'] and track['title']:lower():find(language[3])) then
             mp.msg.warn('Embedded ' .. language[1] .. ' subtitles are present')
             mp.msg.warn('=> NOT downloading new subtitles')

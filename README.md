@@ -57,7 +57,7 @@ so you are free to modify and adapt this script to your needs:
 check out the [MPV Lua API](https://mpv.io/manual/stable/#lua-scripting) for more information.
 
 If you find yourself unable to find the correct subtitles for some niche movies/series,
-you might be interested in the [submod](https://github.com/DavidDeprost/submod_rs)
+you might be interested in the [submod](https://github.com/davidde/submod_rs)
 command line tool I've written to manually correct subtitle timing.
 
 ## Credits

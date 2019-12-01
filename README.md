@@ -1,4 +1,4 @@
-# Automatic subtitle downloading for MPV
+# [Automatic subtitle downloading for MPV](https://github.com/davidde/mpv-autosub)
 * Cross-platform: **Windows, Mac and Linux**
 * Multi-language support
 * Subtitle provider login support

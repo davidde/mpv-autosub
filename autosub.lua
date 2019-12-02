@@ -163,51 +163,49 @@ function control_downloads()
         return
     end
 
-    local track_list = mp.get_property_native('track-list')
-    if bools.debug then -- Log subtitle properties to terminal:
-        for _, track in ipairs(track_list) do
-            if track['type'] == 'sub' then
-                mp.msg.warn('Subtitle track', track['id'], ':\n{')
-                for k, v in pairs(track) do
-                    if type(v) == 'string' then v = '"' .. v .. '"' end
-                    mp.msg.warn('  "' .. k .. '":', v)
-                end
-                mp.msg.warn('}\n')
-            end
+    sub_tracks = {}
+    for _, track in ipairs(mp.get_property_native('track-list')) do
+        if track['type'] == 'sub' then
+            sub_tracks[#sub_tracks + 1] = track
         end
     end
-    for _, language in ipairs(languages) do
-        if should_download_subs_in(language, track_list) then
-            if download_subs(language) == true then
-                return
+    if bools.debug then -- Log subtitle properties to terminal:
+        for _, track in ipairs(sub_tracks) do
+            mp.msg.warn('Subtitle track', track['id'], ':\n{')
+            for k, v in pairs(track) do
+                if type(v) == 'string' then v = '"' .. v .. '"' end
+                mp.msg.warn('  "' .. k .. '":', v)
             end
-        else
-            return
+            mp.msg.warn('}\n')
         end
+    end
+
+    for _, language in ipairs(languages) do
+        if should_download_subs_in(language) then
+            if download_subs(language) then return end -- Download successful!
+        else return end -- No need to download!
     end
     log('No subtitles were found')
 end
 
 -- Check if new subtitles should be downloaded in this language:
-function should_download_subs_in(language, track_list)
-    for _, track in ipairs(track_list) do
-        if track['type'] == 'sub' then
-            local subtitles = track['external'] and 'subtitle file' or 'embedded subtitles'
+function should_download_subs_in(language)
+    for i, track in ipairs(sub_tracks) do
+        local subtitles = track['external'] and 'subtitle file' or 'embedded subtitles'
 
-            if not track['lang'] then
-                log('Unknown language ' .. subtitles .. ' present')
-                mp.msg.warn('=> NOT downloading new subtitles')
-                return false -- Don't download if 'lang' key is absent
-            elseif track['lang'] == language[3] or track['lang'] == language[2] then
-                if not track['selected'] then
-                    mp.set_property('sid', track['id'])
-                    log('Enabled ' .. language[1] .. ' ' .. subtitles .. '!')
-                else
-                    log(language[1] .. ' ' .. subtitles .. ' active')
-                end
-                mp.msg.warn('=> NOT downloading new subtitles')
-                return false -- The right subtitles are already present
+        if not track['lang'] and i == #sub_tracks then
+            log('Unknown language ' .. subtitles .. ' present')
+            mp.msg.warn('=> NOT downloading new subtitles')
+            return false -- Don't download if 'lang' key is absent
+        elseif track['lang'] == language[3] or track['lang'] == language[2] then
+            if not track['selected'] then
+                mp.set_property('sid', track['id'])
+                log('Enabled ' .. language[1] .. ' ' .. subtitles .. '!')
+            else
+                log(language[1] .. ' ' .. subtitles .. ' active')
             end
+            mp.msg.warn('=> NOT downloading new subtitles')
+            return false -- The right subtitles are already present
         end
     end
     mp.msg.warn('No ' .. language[1] .. ' subtitles were detected\n' ..
@@ -221,7 +219,6 @@ function log(string, secs)
     mp.msg.warn(string)          -- This logs to the terminal
     mp.osd_message(string, secs) -- This logs to MPV screen
 end
-
 
 mp.add_key_binding('b', 'download_subs', download_subs)
 mp.add_key_binding('n', 'download_subs2', download_subs2)

@@ -43,10 +43,10 @@ local logins = {
 -->>    ADDITIONAL OPTIONS:
 --=============================================================================
 local bools = {
-    auto = true,  -- Automatically download subtitles, no hotkeys required
-    debug = true, -- Use `--debug` in subliminal command for debug output
-    force = true, -- Force download; will overwrite existing subtitle files
-    utf8 = true,  -- Save all subtitle files as UTF-8
+    auto = true,   -- Automatically download subtitles, no hotkeys required
+    debug = false, -- Use `--debug` in subliminal command for debug output
+    force = true,  -- Force download; will overwrite existing subtitle files
+    utf8 = true,   -- Save all subtitle files as UTF-8
 }
 local excludes = {
     -- Movies with a path containing any of these strings/paths
@@ -164,7 +164,18 @@ function control_downloads()
     end
 
     local track_list = mp.get_property_native('track-list')
-    -- mp.msg.warn('track_list = ', mp.get_property('track-list'), '\n')
+    if bools.debug then -- Log subtitle properties to terminal:
+        for _, track in ipairs(track_list) do
+            if track['type'] == 'sub' then
+                mp.msg.warn('Subtitle track', track['id'], ':\n{')
+                for k, v in pairs(track) do
+                    if type(v) == 'string' then v = '"' .. v .. '"' end
+                    mp.msg.warn('  "' .. k .. '":', v)
+                end
+                mp.msg.warn('}\n')
+            end
+        end
+    end
     for _, language in ipairs(languages) do
         if should_download_subs_in(language, track_list) then
             if download_subs(language) == true then

@@ -192,12 +192,21 @@ end
 function should_download_subs_in(language, track_list)
     for _, track in ipairs(track_list) do
         if track['type'] == 'sub' then
-            if track['external'] == false then
-                if embedded_subs_in(language, track) then
-                    return false
+            local subtitles = track['external'] and 'subtitle file' or 'embedded subtitles'
+
+            if not track['lang'] then
+                log('Unknown language ' .. subtitles .. ' present')
+                mp.msg.warn('=> NOT downloading new subtitles')
+                return false -- Don't download if 'lang' key is absent
+            elseif track['lang'] == language[3] or track['lang'] == language[2] then
+                if not track['selected'] then
+                    mp.set_property('sid', track['id'])
+                    log('Enabled ' .. language[1] .. ' ' .. subtitles .. '!')
+                else
+                    log(language[1] .. ' ' .. subtitles .. ' active')
                 end
-            elseif external_subs_in(language, track) then
-                return false
+                mp.msg.warn('=> NOT downloading new subtitles')
+                return false -- The right subtitles are already present
             end
         end
     end
@@ -206,62 +215,11 @@ function should_download_subs_in(language, track_list)
     return true
 end
 
--- Check if embedded subs are present in the right language:
-function embedded_subs_in(language, track)
-    if not track['lang'] and not track['title'] then
-        log('Unknown embedded subtitles active')
-        mp.msg.warn('=> NOT downloading new subtitles')
-        return true -- Don't download if 'lang' key is absent
-    elseif track['lang'] == language[3] or track['lang'] == language[2]
-        or (track['title'] and track['title']:lower():find(language[3])) then
-            mp.msg.warn('Embedded ' .. language[1] .. ' subtitles are present')
-            mp.msg.warn('=> NOT downloading new subtitles')
-            sleep(1.5) -- Do not overwrite potential previous OSD message
-            if not track['selected'] then
-                mp.set_property('sid', track['id'])
-                log('Enabled embedded ' .. language[1] .. ' subtitles!')
-            else
-                log('Embedded ' .. language[1] .. ' subtitles active')
-            end
-            return true -- The right embedded subtitles are already present
-    end
-end
-
--- Check if external subtitle file is present in the right language:
-function external_subs_in(language, track)
-    local video_name = mp.get_property('filename/no-ext')
-    local sub_name = track['title']:sub(1, -5)
-    local lang = sub_name:sub(video_name:len() + 2)
-    if video_name == sub_name then
-        mp.msg.warn('An exactly matching external ' ..
-            'subtitle file of unknown language is present')
-        mp.msg.warn('=> NOT downloading other subtitles')
-        return true -- The right external subtitle file is already present
-    elseif lang == language[2] then
-        mp.msg.warn('A matching ' .. language[1] ..
-            ' subtitle file is present')
-        mp.msg.warn('=> NOT downloading other subtitles')
-        if not track['selected'] then
-            mp.set_property('sid', track['id'])
-            sleep(1.5) -- Do not overwrite potential previous OSD message
-            log('Enabled external ' .. language[1] .. ' subtitle file!')
-        end
-        return true -- The right external subtitle file is already present
-    end
-end
-
 -- Log function: log to both terminal and MPV OSD (On-Screen Display)
 function log(string, secs)
     secs = secs or 2.5  -- secs defaults to 2.5 when secs parameter is absent
     mp.msg.warn(string)          -- This logs to the terminal
     mp.osd_message(string, secs) -- This logs to MPV screen
-end
-
--- Sleep function: give the MPV OSD messages time to be read
--- before being overwritten by the next message
-function sleep(s)
-    local ntime = os.time() + s
-    repeat until os.time() > ntime
 end
 
 

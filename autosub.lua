@@ -193,11 +193,12 @@ function should_download_subs_in(language)
     for i, track in ipairs(sub_tracks) do
         local subtitles = track['external'] and 'subtitle file' or 'embedded subtitles'
 
-        if not track['lang'] and i == #sub_tracks then
+        if not track['lang'] and (track['external'] or not track['title']) and i == #sub_tracks then
             log('Unknown language ' .. subtitles .. ' present')
             mp.msg.warn('=> NOT downloading new subtitles')
             return false -- Don't download if 'lang' key is absent
-        elseif track['lang'] == language[3] or track['lang'] == language[2] then
+        elseif track['lang'] == language[3] or track['lang'] == language[2] or
+          (track['title'] and track['title']:lower():find(language[3])) then
             if not track['selected'] then
                 mp.set_property('sid', track['id'])
                 log('Enabled ' .. language[1] .. ' ' .. subtitles .. '!')

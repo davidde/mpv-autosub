@@ -191,10 +191,13 @@ end
 -- Check if new subtitles should be downloaded in this language:
 function should_download_subs_in(language)
     for i, track in ipairs(sub_tracks) do
-        local subtitles = track['external'] and 'subtitle file' or 'embedded subtitles'
+        local subtitles = track['external'] and
+          'subtitle file' or 'embedded subtitles'
 
-        if not track['lang'] and (track['external'] or not track['title']) and i == #sub_tracks then
-            log('Unknown language ' .. subtitles .. ' present')
+        if not track['lang'] and (track['external'] or not track['title'])
+          and i == #sub_tracks then
+            local status = track['selected'] and ' active' or ' present'
+            log('Unknown ' .. subtitles .. status)
             mp.msg.warn('=> NOT downloading new subtitles')
             return false -- Don't download if 'lang' key is absent
         elseif track['lang'] == language[3] or track['lang'] == language[2] or
@@ -220,6 +223,7 @@ function log(string, secs)
     mp.msg.warn(string)          -- This logs to the terminal
     mp.osd_message(string, secs) -- This logs to MPV screen
 end
+
 
 mp.add_key_binding('b', 'download_subs', download_subs)
 mp.add_key_binding('n', 'download_subs2', download_subs2)

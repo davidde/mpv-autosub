@@ -130,6 +130,11 @@ function control_downloads()
     mp.commandv('rescan_external_files')
     directory, filename = utils.split_path(mp.get_property('path'))
 
+    if directory:find('^http') then
+        mp.msg.warn('Automatic subtitle downloading is disabled for web streaming')
+        return
+    end
+
     if not bools.auto then
         mp.msg.warn('Automatic downloading disabled!')
         return

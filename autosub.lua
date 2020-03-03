@@ -95,9 +95,7 @@ function download_subs(language)
 
     a[#a + 1] = '-l'
     a[#a + 1] = language[2]
-    a[#a + 1] = '-d'
-    a[#a + 1] = directory
-    a[#a + 1] = filename --> Subliminal command ends with the movie filename.
+    a[#a + 1] = mp.get_property('path') --> Subliminal command ends with the movie file.
 
     local result = utils.subprocess(table)
 

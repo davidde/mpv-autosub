@@ -122,6 +122,8 @@ end
 
 -- Control function: only download if necessary
 function control_downloads()
+    -- If it's audio file format and auto download enabled - do nothing
+    if bools.auto and allowed_media_type() == false then return end
     -- Make MPV accept external subtitle files with language specifier:
     mp.set_property('sub-auto', 'fuzzy')
     -- Set subtitle language preference:
@@ -228,6 +230,38 @@ function log(string, secs)
     mp.msg.warn(string)          -- This logs to the terminal
     mp.osd_message(string, secs) -- This logs to MPV screen
 end
+
+-- No reason to search subtitles for audio files on auto download
+function allowed_media_type()
+    not_allowed = {'mp3',
+                   'm4a',
+                   'wav',
+                   'wv',
+                   'flac',
+                   'ape',
+                   'ogg',
+                   'aac',
+                   'aiff',
+                   'cue/flac',
+                   'cue/m4a',
+                   'cue/mp3',
+                   'cue/wav',
+                   'cue/wv',
+                   'cue/ape',
+                   'cue/ogg',
+                   'cue/aac',
+                   'cue/aiff'}
+    active_format = mp.get_property('file-format')
+    for _, file_format in pairs(not_allowed) do
+        if file_format == active_format then
+            log(file_format .. ' audio file detected')
+            mp.msg.warn('=> NOT downloading subtitles')
+            return false
+        end
+    end
+    return true
+end
+
 
 
 mp.add_key_binding('b', 'download_subs', download_subs)

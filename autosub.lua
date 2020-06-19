@@ -122,8 +122,6 @@ end
 
 -- Control function: only download if necessary
 function control_downloads()
-    -- If it's audio file format and auto download enabled - do nothing
-    if bools.auto and allowed_media_type() == false then return end
     -- Make MPV accept external subtitle files with language specifier:
     mp.set_property('sub-auto', 'fuzzy')
     -- Set subtitle language preference:
@@ -132,41 +130,7 @@ function control_downloads()
     mp.commandv('rescan_external_files')
     directory, filename = utils.split_path(mp.get_property('path'))
 
-    if directory:find('^http') then
-        mp.msg.warn('Automatic subtitle downloading is disabled for web streaming')
-        return
-    end
-
-    if not bools.auto then
-        mp.msg.warn('Automatic downloading disabled!')
-        return
-    end
-
-    for _, exclude in ipairs(excludes) do
-        local escaped_exclude = exclude:gsub('%W','%%%0')
-        local excluded = directory:find(escaped_exclude)
-
-        if excluded then
-            mp.msg.warn('This path is excluded from auto-downloading subs')
-            return
-        end
-    end
-
-    for i, include in ipairs(includes) do
-        local escaped_include = include:gsub('%W','%%%0')
-        local included = directory:find(escaped_include)
-
-        if included then break
-        elseif i == #includes then
-            mp.msg.warn('This path is not included for auto-downloading subs')
-            return
-        end
-    end
-
-    local duration = tonumber(mp.get_property('duration'))
-    if duration < 900 then
-        mp.msg.warn('Video is less than 15 minutes\n' ..
-                    '=> NOT downloading any subtitles')
+    if not autosub_allowed() then
         return
     end
 
@@ -195,7 +159,60 @@ function control_downloads()
     log('No subtitles were found')
 end
 
--- Check if new subtitles should be downloaded in this language:
+-- Check if subtitles should be auto-downloaded:
+function autosub_allowed()
+    local duration = tonumber(mp.get_property('duration'))
+    local active_format = mp.get_property('file-format')
+
+    if not bools.auto then
+        mp.msg.warn('Automatic downloading disabled!')
+        return false
+    elseif duration < 900 then
+        mp.msg.warn('Video is less than 15 minutes\n' ..
+                      '=> NOT auto-downloading subtitles')
+        return false
+    elseif directory:find('^http') then
+        mp.msg.warn('Automatic subtitle downloading is disabled for web streaming')
+        return false
+    elseif active_format:find('^cue') then
+        mp.msg.warn('Automatic subtitle downloading is disabled for cue files')
+        return false
+    else
+        local not_allowed = {'aiff', 'ape', 'flac', 'mp3', 'ogg', 'wav', 'wv'}
+
+        for _, file_format in pairs(not_allowed) do
+            if file_format == active_format then
+                mp.msg.warn('Automatic subtitle downloading is disabled for audio files')
+                return false
+            end
+        end
+
+        for _, exclude in pairs(excludes) do
+            local escaped_exclude = exclude:gsub('%W','%%%0')
+            local excluded = directory:find(escaped_exclude)
+
+            if excluded then
+                mp.msg.warn('This path is excluded from auto-downloading subs')
+                return false
+            end
+        end
+
+        for i, include in ipairs(includes) do
+            local escaped_include = include:gsub('%W','%%%0')
+            local included = directory:find(escaped_include)
+
+            if included then break
+            elseif i == #includes then
+                mp.msg.warn('This path is not included for auto-downloading subs')
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
+-- Check if subtitles should be downloaded in this language:
 function should_download_subs_in(language)
     for i, track in ipairs(sub_tracks) do
         local subtitles = track['external'] and
@@ -230,34 +247,6 @@ function log(string, secs)
     mp.msg.warn(string)          -- This logs to the terminal
     mp.osd_message(string, secs) -- This logs to MPV screen
 end
-
--- No reason to search subtitles for audio files on auto download
-function allowed_media_type()
-    not_allowed = {'mp3',
-                   'wav',
-                   'wv',
-                   'flac',
-                   'ape',
-                   'ogg',
-                   'aiff',
-                   'cue/flac',
-                   'cue/mp3',
-                   'cue/wav',
-                   'cue/wv',
-                   'cue/ape',
-                   'cue/ogg',
-                   'cue/aiff'}
-    active_format = mp.get_property('file-format')
-    for _, file_format in pairs(not_allowed) do
-        if file_format == active_format then
-            log(file_format .. ' audio file detected')
-            mp.msg.warn('=> NOT downloading subtitles')
-            return false
-        end
-    end
-    return true
-end
-
 
 
 mp.add_key_binding('b', 'download_subs', download_subs)

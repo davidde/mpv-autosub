@@ -234,22 +234,18 @@ end
 -- No reason to search subtitles for audio files on auto download
 function allowed_media_type()
     not_allowed = {'mp3',
-                   'm4a',
                    'wav',
                    'wv',
                    'flac',
                    'ape',
                    'ogg',
-                   'aac',
                    'aiff',
                    'cue/flac',
-                   'cue/m4a',
                    'cue/mp3',
                    'cue/wav',
                    'cue/wv',
                    'cue/ape',
                    'cue/ogg',
-                   'cue/aac',
                    'cue/aiff'}
     active_format = mp.get_property('file-format')
     for _, file_format in pairs(not_allowed) do

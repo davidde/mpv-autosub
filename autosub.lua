@@ -68,6 +68,11 @@ local utils = require 'mp.utils'
 -- Download function: download the best subtitles in most preferred language
 function download_subs(language)
     language = language or languages[1]
+    if #language == 0 then
+        log('No Language found\n')
+        return false
+    end
+            
     log('Searching ' .. language[1] .. ' subtitles ...', 30)
 
     -- Build the `subliminal` command, starting with the executable:

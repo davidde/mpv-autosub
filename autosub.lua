@@ -3,7 +3,9 @@
 --=============================================================================
 --          This script uses Subliminal to download subtitles,
 --          so make sure to specify your system's Subliminal location below:
-local subliminal = '/home/david/.local/bin/subliminal'
+local subliminal = 'subliminal'
+local temp_dir = 'C:\\Users\\alima\\AppData\\Local\\Temp'
+local limiter = '\\' -- use '\\' for Windows, '/' for Unix
 --=============================================================================
 -->>    SUBTITLE LANGUAGE:
 --=============================================================================
@@ -14,8 +16,8 @@ local languages = {
 --          If subtitles are found for the first language,
 --          other languages will NOT be downloaded,
 --          so put your preferred language first:
-            { 'English', 'en', 'eng' },
             { 'Dutch', 'nl', 'dut' },
+            { 'English', 'en', 'eng' },
 --          { 'Spanish', 'es', 'spa' },
 --          { 'French', 'fr', 'fre' },
 --          { 'German', 'de', 'ger' },
@@ -34,9 +36,9 @@ local languages = {
 --          If you use any of these services, simply uncomment it
 --          and replace 'USERNAME' and 'PASSWORD' with your own:
 local logins = {
---          { '--addic7ed', 'USERNAME', 'PASSWORD' },
+--          { '--opensubtitles', 'USERNAME', 'PASSWORD'},
+--          { '--addic7ed', 'USERNAME', 'PASSWORD'},
 --          { '--legendastv', 'USERNAME', 'PASSWORD' },
---          { '--opensubtitles', 'USERNAME', 'PASSWORD' },
 --          { '--subscenter', 'USERNAME', 'PASSWORD' },
 }
 --=============================================================================
@@ -101,9 +103,12 @@ function download_subs(language)
     a[#a + 1] = '-l'
     a[#a + 1] = language[2]
     a[#a + 1] = '-d'
-    a[#a + 1] = directory
+    if directory:find('^http') then
+        a[#a + 1] = temp_dir
+    else
+        a[#a + 1] = directory
+    end
     a[#a + 1] = filename --> Subliminal command ends with the movie filename.
-
     local result = utils.subprocess(table)
 
     if string.find(result.stdout, 'Downloaded 1 subtitle') then
@@ -112,6 +117,10 @@ function download_subs(language)
         mp.set_property('slang', language[2])
         -- Subtitles are downloaded successfully, so rescan to activate them:
         mp.commandv('rescan_external_files')
+        -- if file is url, subs need to be loaded manually
+        if directory:find('^http') then
+            mp.commandv("sub-add", temp_dir .. limiter .. filename:match('(.+)%.%w+$') .. "." .. language[2] .. ".srt")
+        end
         log(language[1] .. ' subtitles ready!')
         return true
     else
@@ -119,7 +128,6 @@ function download_subs(language)
         return false
     end
 end
-
 -- Manually download second language subs by pressing 'n':
 function download_subs2()
     download_subs(languages[2])
@@ -176,9 +184,9 @@ function autosub_allowed()
         mp.msg.warn('Video is less than 15 minutes\n' ..
                       '=> NOT auto-downloading subtitles')
         return false
-    elseif directory:find('^http') then
-        mp.msg.warn('Automatic subtitle downloading is disabled for web streaming')
-        return false
+    -- elseif directory:find('^http') then
+    --     mp.msg.warn('Automatic subtitle downloading is disabled for web streaming')
+    --     return false
     elseif active_format:find('^cue') then
         mp.msg.warn('Automatic subtitle downloading is disabled for cue files')
         return false

@@ -16,8 +16,8 @@ local languages = {
 --          If subtitles are found for the first language,
 --          other languages will NOT be downloaded,
 --          so put your preferred language first:
-            { 'Dutch', 'nl', 'dut' },
-            { 'English', 'en', 'eng' },
+{ 'English', 'en', 'eng' },
+{ 'Dutch', 'nl', 'dut' },
 --          { 'Spanish', 'es', 'spa' },
 --          { 'French', 'fr', 'fre' },
 --          { 'German', 'de', 'ger' },
@@ -36,8 +36,8 @@ local languages = {
 --          If you use any of these services, simply uncomment it
 --          and replace 'USERNAME' and 'PASSWORD' with your own:
 local logins = {
---          { '--opensubtitles', 'USERNAME', 'PASSWORD'},
---          { '--addic7ed', 'USERNAME', 'PASSWORD'},
+    { '--opensubtitles', 'USER', 'PASS'},
+    { '--addic7ed', 'USER', 'PASS'},
 --          { '--legendastv', 'USERNAME', 'PASSWORD' },
 --          { '--subscenter', 'USERNAME', 'PASSWORD' },
 }
@@ -166,7 +166,7 @@ function control_downloads()
 
     for _, language in ipairs(languages) do
         if should_download_subs_in(language) then
-            if download_subs(language) then return end -- Download successful!
+            download_subs(language)
         else return end -- No need to download!
     end
     log('No subtitles were found')

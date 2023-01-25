@@ -219,6 +219,10 @@ end
 
 -- Check if subtitles should be downloaded in this language:
 function should_download_subs_in(language)
+
+    local selected = false
+    local track_to_select = nil
+
     for i, track in ipairs(sub_tracks) do
         local subtitles = track['external'] and
           'subtitle file' or 'embedded subtitles'
@@ -231,19 +235,29 @@ function should_download_subs_in(language)
             return false -- Don't download if 'lang' key is absent
         elseif track['lang'] == language[3] or track['lang'] == language[2] or
           (track['title'] and track['title']:lower():find(language[3])) then
-            if not track['selected'] then
-                mp.set_property('sid', track['id'])
-                log('Enabled ' .. language[1] .. ' ' .. subtitles .. '!')
+            if track['selected'] then
+                selected = true
+                break
             else
-                log(language[1] .. ' ' .. subtitles .. ' active')
+                track_to_select = track
             end
-            mp.msg.warn('=> NOT downloading new subtitles')
-            return false -- The right subtitles are already present
         end
     end
-    mp.msg.warn('No ' .. language[1] .. ' subtitles were detected\n' ..
-                '=> Proceeding to download:')
-    return true
+
+    if selected then
+        log(language[1] .. ' subtitles active')
+        mp.msg.warn('=> NOT downloading new subtitles')
+        return false -- The right subtitles are already active
+    elseif track_to_select then
+        mp.set_property('sid', track_to_select['id'])
+        log('Enabled ' .. language[1] .. ' subtitles!')
+        mp.msg.warn('=> NOT downloading new subtitles')
+        return false -- The right subtitles are already present
+    else
+        mp.msg.warn('No ' .. language[1] .. ' subtitles were detected\n' ..
+                    '=> Proceeding to download:')
+        return true
+    end
 end
 
 -- Log function: log to both terminal and MPV OSD (On-Screen Display)

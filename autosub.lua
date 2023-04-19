@@ -61,6 +61,7 @@ local includes = {
     -- Full paths are also allowed, e.g.:
     -- '/home/david/Videos',
 }
+local subfolderName = '\\Subtitles' -- Name of the subfolder; leave empty if they should be stored in the root directory
 --=============================================================================
 local utils = require 'mp.utils'
 
@@ -98,10 +99,13 @@ function download_subs(language)
         a[#a + 1] = 'utf-8'
     end
 
+    os.execute("mkdir " .. directory .. subfolderName) -- Create system folder with the previously specified name
+    local savepath = directory .. subfolderName
+            
     a[#a + 1] = '-l'
     a[#a + 1] = language[2]
     a[#a + 1] = '-d'
-    a[#a + 1] = directory
+    a[#a + 1] = savepath
     a[#a + 1] = filename --> Subliminal command ends with the movie filename.
 
     local result = utils.subprocess(table)

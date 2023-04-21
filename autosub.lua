@@ -61,6 +61,7 @@ local includes = {
     -- Full paths are also allowed, e.g.:
     -- '/home/david/Videos',
 }
+local scan_folders = {'ass', 'srt', 'sub', 'subs', 'subtitles'} -- Before downloading subtitles scan if these folders exist
 --=============================================================================
 local utils = require 'mp.utils'
 
@@ -164,6 +165,24 @@ function control_downloads()
     log('No subtitles were found')
 end
 
+function scan_folder_present()
+	local p = io.popen('dir /b /ad "'..directory..'"')
+	for folder in p:lines() do
+		if folder ~= directory then
+			for _, scan_folder in ipairs(scan_folders) do
+			mp.msg.warn('checking folder ' .. scan_folder)
+				if string.find(string.lower(folder), string.lower(scan_folder)) then
+					log('Subtitles found inside directory "' .. folder .. '"')
+					mp.set_property('sub-auto', 'all')
+					mp.command('rescan_external_files')
+					return true
+				end
+			end	
+		end
+	end
+	return false
+end	
+
 -- Check if subtitles should be auto-downloaded:
 function autosub_allowed()
     local duration = tonumber(mp.get_property('duration'))
@@ -176,6 +195,8 @@ function autosub_allowed()
         mp.msg.warn('Video is less than 15 minutes\n' ..
                       '=> NOT auto-downloading subtitles')
         return false
+    elseif scan_folder_present() then                    
+        return false                    
     elseif directory:find('^http') then
         mp.msg.warn('Automatic subtitle downloading is disabled for web streaming')
         return false

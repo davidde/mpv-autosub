@@ -133,7 +133,7 @@ function control_downloads()
     mp.set_property('slang', languages[1][2])
     mp.msg.warn('Reactivate external subtitle files:')
     mp.commandv('rescan_external_files')
-    directory, filename = utils.split_path(mp.get_property('path'))
+    directory, filename = utils.split_path(utils.getcwd())
 
     if not autosub_allowed() then
         return
